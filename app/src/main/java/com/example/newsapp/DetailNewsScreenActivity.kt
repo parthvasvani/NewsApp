@@ -3,8 +3,6 @@ package com.example.newsapp
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -18,8 +16,8 @@ class DetailNewsScreenActivity : AppCompatActivity() {
         val title = intent.getStringExtra("title")
         val timestamp = intent.getLongExtra("timestamp",0L)
 
-        val titleTextView: TextView = findViewById(R.id.tvTitle)
-        val dateTextView = findViewById<TextView>(R.id.tvTime)
+        val titleTextView: TextView = findViewById(R.id.tvTitle1)
+        val dateTextView = findViewById<TextView>(R.id.tvTime1)
 
         // Convert the timestamp to a Date object
         val date = Date(timestamp)

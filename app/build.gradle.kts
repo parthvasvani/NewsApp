@@ -53,35 +53,22 @@ dependencies {
 
     implementation("androidx.recyclerview:recyclerview:1.3.2")
 
-/*    // Retrofit for networking
+// Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0") // For JSON conversion
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.9.0")
 
-    // Coroutines for asynchronous programming
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+// Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.1")
 
-    // Room for local database
-    implementation("androidx.room:room-runtime:2.5.3")
-    kapt("androidx.room:room-compiler:2.5.3")
-    implementation("androidx.room:room-ktx:2.5.3") // Room extensions for Kotlin
+// Coroutine Lifecycle Scopes
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.2.0")
 
-    // Paging for pagination
-    implementation("androidx.paging:paging-runtime:3.1.3")
 
-    // Glide for image loading
-    implementation("com.github.bumptech.glide:glide:4.15.0")
-    kapt("com.github.bumptech.glide:compiler:4.15.0")
 
-    // Lifecycle components
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 
-    // Material Components for UI elements
-    implementation("com.google.android.material:material:1.11.0")
-
-    // Test dependencies (optional, for unit testing)
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")*/
+    implementation("com.github.bumptech.glide:glide:4.14.2")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.14.2")
 }

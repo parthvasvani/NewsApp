@@ -17,7 +17,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tvTitle"
+        android:id="@+id/tvTitle1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
@@ -27,7 +27,7 @@
         app:layout_constraintTop_toBottomOf="@+id/ivItem" />
 
     <TextView
-        android:id="@+id/tvTime"
+        android:id="@+id/tvTime1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
@@ -35,7 +35,7 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.52"
-        app:layout_constraintStart_toEndOf="@+id/tvTitle"
+        app:layout_constraintStart_toEndOf="@+id/tvTitle1"
         app:layout_constraintTop_toBottomOf="@+id/ivItem" />
 
     <TextView
@@ -46,7 +46,7 @@
         android:text="Author"
         android:textSize="30sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle1" />
 
     <TextView
         android:id="@+id/tvDescription"

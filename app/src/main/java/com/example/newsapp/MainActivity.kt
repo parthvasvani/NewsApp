@@ -1,46 +1,59 @@
 package com.example.newsapp
 
+import android.net.http.HttpException
+import android.os.Build
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
+import android.util.Log
+import android.widget.ImageView
+import androidx.annotation.RequiresExtension
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.textfield.TextInputEditText
+import com.example.newsapp.databinding.ActivityMainBinding
+import java.io.IOException
 
+const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var newsAdapter: NewsAdapter
+    @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Get the current system time once to use for all items
-        val currentTime = System.currentTimeMillis()
+        setupRecyclerView()
 
-        // Data for RecyclerView, all with the same timestamp
-        val items = mutableListOf(
-            ListItem("News Title1", "Source", currentTime),
-            ListItem("News Title2", "Source", currentTime + 60000),
-            ListItem("News Title3", "Source", currentTime + 120000),
-            ListItem("News Title4", "Source", currentTime + 180000)
-        )
-        //val adapter = SearchableNewsItemAdapter(items)
-        val adapter = MyRecyclerViewAdapter(items, this)
-        val recyclerView: RecyclerView = findViewById(R.id.itemRecyclerView)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        lifecycleScope.launchWhenCreated {
+            binding.progressBar.isVisible = true
+            val response = try {
+                RetrofitInterface.api.getNewsItems("Apple", "b221fec9d9584495b715d79e382fa713")
 
-        val searchEditText = findViewById<TextInputEditText>(R.id.searchEditText)
-        searchEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                adapter.filter(s.toString())
+            } catch (e: IOException) {
+                Log.e(TAG, "IOException, you might not have internet connection")
+                binding.progressBar.isVisible = false
+                return@launchWhenCreated
+            } catch (e: HttpException) {
+                Log.e(TAG, "HttpException, unexpected response")
+                binding.progressBar.isVisible = false
+                return@launchWhenCreated
             }
+            if (response.isSuccessful && response.body() != null) {
+                newsAdapter.news = response.body()!!.articles
+            } else {
+                Log.e(TAG, "Response not successful")
+            }
+            binding.progressBar.isVisible = false
+        }
+    }
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-
+    private fun setupRecyclerView() = binding.rvNewsItems.apply {
+        newsAdapter = NewsAdapter()
+        adapter = newsAdapter
+        layoutManager = LinearLayoutManager(this@MainActivity)
     }
 
 }

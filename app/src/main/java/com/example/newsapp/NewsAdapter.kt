@@ -17,7 +17,9 @@ import java.util.TimeZone
 
 class NewsAdapter: RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
+    val originalArticles = mutableListOf<Article>()
     inner class NewsViewHolder(val binding: ListItemBinding) : RecyclerView.ViewHolder(binding.root){
+
         fun bind(article: Article){
            binding.apply {
                 tvTitle.text = article.title
@@ -116,4 +118,15 @@ class NewsAdapter: RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
     }
 
 
+    fun filter(query: String) {
+        if (query.isEmpty()) {
+            differ.submitList(originalArticles.toList()) // Reset to original data
+        } else {
+            val filteredList = originalArticles.filter { article ->
+                article.title.contains(query, ignoreCase = true) ||
+                    article.description?.contains(query, ignoreCase = true) ?: false
+            }
+            differ.submitList(filteredList) // Update the list with filtered data
+        }
+    }
 }

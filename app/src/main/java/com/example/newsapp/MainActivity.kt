@@ -3,6 +3,8 @@ package com.example.newsapp
 import android.net.http.HttpException
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.ImageView
 import androidx.annotation.RequiresExtension
@@ -40,13 +42,42 @@ class MainActivity : AppCompatActivity() {
                 binding.progressBar.isVisible = false
                 return@launchWhenCreated
             }
+
             if (response.isSuccessful && response.body() != null) {
+                // Get the list of articles from the response body
+                val articles = response.body()!!.articles
+
+                // Clear existing data in originalArticles
+                newsAdapter.originalArticles.clear()
+
+                // Add new data to originalArticles and set it in news
+                newsAdapter.originalArticles.addAll(articles) // add data to the original list
+                newsAdapter.news = articles // update the visible list
+
+                binding.progressBar.isVisible = false // hide the progress bar
+            } else {
+                Log.e(TAG, "Response not successful")
+                binding.progressBar.isVisible = false
+            }
+
+            /*if (response.isSuccessful && response.body() != null) { old version
                 newsAdapter.news = response.body()!!.articles
             } else {
                 Log.e(TAG, "Response not successful")
             }
-            binding.progressBar.isVisible = false
+            binding.progressBar.isVisible = false*/
         }
+
+
+        binding.searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                newsAdapter.filter(s.toString()) // Update the adapter with the new query
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
     }
 
 

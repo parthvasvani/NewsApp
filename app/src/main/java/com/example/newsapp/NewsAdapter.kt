@@ -1,5 +1,6 @@
 package com.example.newsapp
 
+import android.content.Intent
 import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -25,6 +26,22 @@ class NewsAdapter: RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
                 tvTitle.text = article.title
                 tvSource.text = article.source.toString()
                 //tvTimeStamp.text = article.publishedAt
+
+
+               root.setOnClickListener {
+                   val context = it.context
+                   val intent = Intent(context, DetailNewsScreenActivity::class.java)
+
+                   // Pass the article data to the new activity
+                   intent.putExtra("EXTRA_IMAGE", article.urlToImage)
+                   intent.putExtra("EXTRA_TITLE", article.title)
+                   intent.putExtra("EXTRA_DESCRIPTION", article.description)
+                   intent.putExtra("EXTRA_AUTHOR",article.author)
+                   intent.putExtra("EXTRA_DATE",article.publishedAt)
+                   // Start the new activity
+                   context.startActivity(intent)
+               }
+
 
                // Parse the publishedAt string into a Date object
                val dateString = article.publishedAt // e.g., "2023-10-01T15:30:00Z"

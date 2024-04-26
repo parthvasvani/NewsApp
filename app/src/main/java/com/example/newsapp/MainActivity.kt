@@ -1,5 +1,6 @@
 package com.example.newsapp
 
+import android.content.Intent
 import android.net.http.HttpException
 import android.os.Build
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.RequiresExtension
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -78,6 +80,15 @@ class MainActivity : AppCompatActivity() {
 
             override fun afterTextChanged(s: Editable?) {}
         })
+
+        val tvTitle = findViewById<TextView?>(R.id.tvTitle)
+        tvTitle?.setOnClickListener {
+            val intent = Intent(this, DetailNewsScreenActivity::class.java)
+            startActivity(intent)
+        } ?: run {
+            Log.d("MainActivity", "tvTitle is null. Please check the layout or initialization.")
+        }
+
     }
 
 

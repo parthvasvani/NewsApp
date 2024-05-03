@@ -24,7 +24,7 @@ class NewsAdapter: RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
         fun bind(article: Article){
            binding.apply {
                 tvTitle.text = article.title
-                tvSource.text = article.source.toString()
+                tvSource.text = article.source.name
                 //tvTimeStamp.text = article.publishedAt
 
 
@@ -141,7 +141,7 @@ class NewsAdapter: RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
         } else {
             val filteredList = originalArticles.filter { article ->
                 article.title.contains(query, ignoreCase = true) ||
-                    article.description?.contains(query, ignoreCase = true) ?: false
+                    article.description.contains(query, ignoreCase = true) ?: false
             }
             differ.submitList(filteredList) // Update the list with filtered data
         }

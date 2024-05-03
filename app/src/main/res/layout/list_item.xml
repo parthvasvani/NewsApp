@@ -33,6 +33,7 @@
         android:textStyle="bold"
         android:ellipsize="end"
         android:maxLines="1"
+        android:fontFamily=""
         app:layout_constraintStart_toEndOf="@+id/ivImage"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_percent="0.5"/>

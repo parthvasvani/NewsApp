@@ -2,14 +2,15 @@ package com.example.newsapp
 
 import android.os.Bundle
 import android.text.format.DateUtils
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import org.w3c.dom.Text
+import kotlinx.coroutines.launch
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
@@ -25,21 +26,11 @@ class DetailNewsScreenActivity : AppCompatActivity() {
         val author = intent.getStringExtra("EXTRA_AUTHOR")
         val publish = intent.getStringExtra("EXTRA_DATE")
 
-
         val tvTitle: TextView = findViewById(R.id.tvTitle1)
         val tvDescription: TextView = findViewById(R.id.tvDescription)
         val ivItem: ImageView = findViewById<ImageView>(R.id.ivItem)
         val tvAuthor: TextView = findViewById(R.id.tvAuthor)
         val tvTime1: TextView = findViewById(R.id.tvTime1)
-
-
-        /*// Convert the timestamp to a Date object
-        val date = Date(timestamp)
-
-        // Format the date as a readable string
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val formattedDate = dateFormat.format(date)*/
-
 
         tvTitle.text = title
         tvDescription.text = description
@@ -83,10 +74,21 @@ class DetailNewsScreenActivity : AppCompatActivity() {
         }
         tvTime1.text = relativeTime
 
-
-
-
-
+        val btnSave = findViewById<Button>(R.id.btnSave)
+        btnSave.setOnClickListener {
+            val savedArticle = SavedArticle(
+                id = "${title}_${author}",  // Unique ID for the article
+                title = title ?: "",
+                description = description ?: "",
+                imageUrl = imageUrl,
+                author = author,
+                publishDate = publish
+            )
+            lifecycleScope.launch {
+                val db = NewsAppDatabase.getDatabase(applicationContext)
+                db.savedArticleDao().saveArticle(savedArticle)
+            }
+        }
     }
 
 }

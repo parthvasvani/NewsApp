@@ -73,25 +73,6 @@ class NewsAdapter: RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
                tvTimeStamp.text = relativeTime
 
-               /*val formattedDate = try {      version 1 for date and time
-                   // Define the input format from the data source
-                   val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {
-                       timeZone = TimeZone.getTimeZone("UTC")
-                   }
-                   val date = inputFormat.parse(dateString)
-
-                   // Define the output format for display
-                   val outputFormat = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.US)
-
-                   // Format the date object into the desired string representation
-                   outputFormat.format(date)
-               } catch (e: ParseException) {
-                   // Handle parsing exceptions
-                   "Invalid date"
-               }
-
-               tvTimeStamp.text = formattedDate*/
-
                val imageUrl = article.urlToImage // assuming Article has an imageUrl field
                Glide.with(ivImage.context) // specify the context
                    .load(imageUrl)          // load the URL
@@ -132,18 +113,5 @@ class NewsAdapter: RecyclerView.Adapter<NewsAdapter.NewsViewHolder>() {
 
     override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         holder.bind(differ.currentList[position])
-    }
-
-
-    fun filter(query: String) {
-        if (query.isEmpty()) {
-            differ.submitList(originalArticles.toList()) // Reset to original data
-        } else {
-            val filteredList = originalArticles.filter { article ->
-                article.title.contains(query, ignoreCase = true) ||
-                    article.description.contains(query, ignoreCase = true) ?: false
-            }
-            differ.submitList(filteredList) // Update the list with filtered data
-        }
     }
 }

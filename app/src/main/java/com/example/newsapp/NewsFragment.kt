@@ -40,7 +40,7 @@ class NewsFragment : Fragment() {
             _binding = null
         }
 
-        //private lateinit var binding: FragmentNewsBinding
+
         private lateinit var newsAdapter: NewsAdapter
         private lateinit var currentQuery: String
 

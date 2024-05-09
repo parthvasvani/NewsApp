@@ -15,7 +15,8 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
 
-class SavedArticleAdapter: RecyclerView.Adapter<SavedArticleAdapter.SavedArticleViewHolder>() {
+class SavedArticleAdapter(private val onItemClick: (SavedArticle) -> Unit)
+    : RecyclerView.Adapter<SavedArticleAdapter.SavedArticleViewHolder>() {
 
     inner class SavedArticleViewHolder(val binding: ListItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -61,6 +62,11 @@ class SavedArticleAdapter: RecyclerView.Adapter<SavedArticleAdapter.SavedArticle
                     .error(R.drawable.error) // error image if there's a problem
                     .apply(RequestOptions.bitmapTransform(CircleCrop()))
                     .into(ivImage)
+
+                // Set item click listener
+                binding.root.setOnClickListener {
+                    onItemClick(article) // Call the listener
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.newsapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +29,18 @@ class SavedNewsFragment : Fragment() {
         recyclerView = view.findViewById(R.id.rvNewsItems1)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        adapter = SavedArticleAdapter()  // Start with an empty list
+        val onItemClick: (SavedArticle) -> Unit = { article ->
+            val intent = Intent(requireContext(), DetailNewsScreenActivity::class.java).apply {
+                putExtra("EXTRA_TITLE", article.title)
+                putExtra("EXTRA_DESCRIPTION", article.description)
+                putExtra("EXTRA_IMAGE", article.imageUrl)
+                putExtra("EXTRA_AUTHOR", article.author)
+                putExtra("EXTRA_DATE", article.publishDate)
+            }
+            startActivity(intent)
+        }
+
+        adapter = SavedArticleAdapter(onItemClick)  // Start with an empty list
         recyclerView.adapter = adapter
 
         // Load saved articles

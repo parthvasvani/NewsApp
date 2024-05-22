@@ -1,8 +1,8 @@
 package com.example.newsapp
 
-import android.content.Context
-import android.content.res.Configuration
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,14 +15,13 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.Fragment
 import java.util.Locale
 
-private const val SELECTED_LANGUAGE = "selected_language"
 class SettingsFragment: Fragment() {
 
     private lateinit var themeRadioGroup: RadioGroup
     private lateinit var lightThemeRadioButton: RadioButton
     private lateinit var darkThemeRadioButton: RadioButton
     private lateinit var languageSpinner: Spinner
-
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_settings, container, false)
@@ -36,6 +35,69 @@ class SettingsFragment: Fragment() {
         lightThemeRadioButton = view.findViewById(R.id.rbLight)
         darkThemeRadioButton = view.findViewById(R.id.rbDark)
         languageSpinner = view.findViewById(R.id.spLanguage)
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+
+        setupLanguageSelection()
+        setupThemeSelection()
+    }
+
+    private fun setupLanguageSelection() {
+        val languages = listOf(
+            "Arabic", "German", "English", "Spanish", "French", "Hebrew",
+            "Italian", "Dutch", "Norwegian", "Portuguese", "Russian",
+            "Swedish", "Urdu", "Chinese"
+        )
+        val languageCodes = listOf(
+            "ar", "de", "en", "es", "fr", "he", "it", "nl", "no", "pt",
+            "ru", "sv", "ud", "zh"
+        )
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, languages)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        languageSpinner.adapter = adapter
+
+        // Set current language selection
+        val currentLanguageCode = sharedPreferences.getString("language", "en") ?: "en"
+        val currentIndex = languageCodes.indexOf(currentLanguageCode)
+        if (currentIndex >= 0) {
+            languageSpinner.setSelection(currentIndex)
+        }
+
+        languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val selectedLanguageCode = languageCodes[position]
+                if (selectedLanguageCode != currentLanguageCode) {
+                    saveLanguagePreference(selectedLanguageCode)
+                    setLocale(selectedLanguageCode)
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {}
+        }
+    }
+
+    private fun saveLanguagePreference(languageCode: String) {
+        sharedPreferences.edit().putString("language", languageCode).apply()
+    }
+
+    private fun setLocale(languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        requireActivity().resources.updateConfiguration(config, requireActivity().resources.displayMetrics)
+
+        // Restart the activity to apply the new language
+        requireActivity().recreate()
+    }
+
+    private fun setupThemeSelection() {
+        // Set current theme selection
+        val currentThemeMode = AppCompatDelegate.getDefaultNightMode()
+        if (currentThemeMode == AppCompatDelegate.MODE_NIGHT_YES) {
+            darkThemeRadioButton.isChecked = true
+        } else {
+            lightThemeRadioButton.isChecked = true
+        }
 
         // Handle theme selection
         themeRadioGroup.setOnCheckedChangeListener { _, checkedId ->
@@ -44,47 +106,14 @@ class SettingsFragment: Fragment() {
                 R.id.rbDark -> setTheme(AppTheme.DARK)
             }
         }
-
-        // Populate language spinner
-        val languages = arrayOf("English", "Spanish", "French", "German")
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, languages)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        languageSpinner.adapter = adapter
-
-        // Handle language selection
-        languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parentView: AdapterView<*>?, selectedItemView: View?, position: Int, id: Long) {
-                val selectedLanguage = languages[position]
-                setLanguage(selectedLanguage)
-            }
-
-            override fun onNothingSelected(parentView: AdapterView<*>?) {
-                // Do nothing
-            }
-        }
     }
 
     private fun setTheme(theme: AppTheme) {
-        // Implement theme change logic here
-
         val mode = when (theme) {
             AppTheme.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
             AppTheme.DARK -> AppCompatDelegate.MODE_NIGHT_YES
         }
         AppCompatDelegate.setDefaultNightMode(mode)
-    }
-
-    private fun setLanguage(language: String) {
-        // Implement language change logic here
-        val locale = Locale(language)
-        Locale.setDefault(locale)
-        val config = Configuration()
-        config.locale = locale
-        context?.resources?.updateConfiguration(config, requireContext().resources.displayMetrics)
-
-        // Save selected language for next app launch
-        val preferences = context?.getSharedPreferences("Settings", Context.MODE_PRIVATE)
-        preferences?.edit()?.putString(SELECTED_LANGUAGE, language)?.apply()
     }
 
     enum class AppTheme {

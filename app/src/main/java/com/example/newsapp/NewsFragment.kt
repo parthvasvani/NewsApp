@@ -1,9 +1,11 @@
 package com.example.newsapp
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.net.http.HttpException
 import android.os.Build
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -20,11 +22,14 @@ import com.example.newsapp.databinding.FragmentNewsBinding
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
+import java.util.Locale
 
-class NewsFragment : Fragment() {
+class NewsFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
         private var _binding: FragmentNewsBinding? = null
         private val binding get() = _binding!!
+        private lateinit var sharedPreferences: SharedPreferences
+
 
         override fun onCreateView(
             inflater: LayoutInflater,
@@ -44,9 +49,14 @@ class NewsFragment : Fragment() {
         private lateinit var newsAdapter: NewsAdapter
         private lateinit var currentQuery: String
 
+
         @Deprecated("Deprecated in Java")
         @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
         override fun onActivityCreated(savedInstanceState: Bundle?) {
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+
+
             super.onActivityCreated(savedInstanceState)
             // Set up RecyclerView, adapters, and other logic from MainActivity here
 
@@ -66,6 +76,7 @@ class NewsFragment : Fragment() {
             })
 
 
+
             val tvTitle = view?.findViewById<TextView?>(R.id.tvTitle)
             tvTitle?.setOnClickListener {
                 val intent = Intent(requireContext(), DetailNewsScreenActivity::class.java)
@@ -74,6 +85,7 @@ class NewsFragment : Fragment() {
                 Log.d("MainActivity", "tvTitle is null. Please check the layout or initialization.")
             }
         }
+
 
     private fun setupRecyclerView() = binding.rvNewsItems.apply {
         newsAdapter = NewsAdapter()
@@ -89,11 +101,12 @@ class NewsFragment : Fragment() {
 
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     private fun fetchNewsData() {
+        val languageCode = applySavedLanguage()
         lifecycleScope.launch {
             binding.progressBar.isVisible = true
 
             val response: Response<NewsApiResponse> = try {
-                RetrofitInterface.api.getNewsItems(currentQuery, "b221fec9d9584495b715d79e382fa713")
+                RetrofitInterface.api.getNewsItems(currentQuery, "b221fec9d9584495b715d79e382fa713", languageCode)
             } catch (e: IOException) {
                 Log.e(TAG, "IOException, check your internet connection")
                 binding.progressBar.isVisible = false
@@ -113,7 +126,34 @@ class NewsFragment : Fragment() {
             }
 
             binding.progressBar.isVisible = false
+
+
         }
 
         }
+    private fun applySavedLanguage(): String {
+        val languageCode = sharedPreferences.getString("language", "en") ?: "en"
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        requireContext().createConfigurationContext(config)
+        return languageCode
     }
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "language") {
+            applySavedLanguage()
+            requireActivity().recreate() // Recreate the activity to apply the language change
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+    }
+
+    companion object {
+        private const val TAG = "NewsFragment"
+    }
+
+}

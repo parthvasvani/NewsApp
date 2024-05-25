@@ -1,7 +1,9 @@
 package com.example.newsapp
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,20 +11,24 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
-class SavedNewsFragment : Fragment() {
+class SavedNewsFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: SavedArticleAdapter
+    private lateinit var sharedPreferences: SharedPreferences
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this)
 
         val view = inflater.inflate(R.layout.fragment_saved_news, container, false)
 
@@ -45,6 +51,7 @@ class SavedNewsFragment : Fragment() {
 
         // Load saved articles
         loadSavedArticles()
+        applySavedLanguage()
 
         return view
     }
@@ -58,5 +65,27 @@ class SavedNewsFragment : Fragment() {
                 adapter.news = savedArticles
                 adapter.notifyDataSetChanged()
         }
+    }
+
+    private fun applySavedLanguage() {
+        val languageCode = sharedPreferences.getString("language", "en") ?: "en"
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        requireContext().createConfigurationContext(config)
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        if (key == "language") {
+            applySavedLanguage()
+            requireActivity().recreate() // Recreate the activity to apply the language change
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 }
